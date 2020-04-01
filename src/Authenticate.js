@@ -75,6 +75,32 @@ class Authenticate extends Component {
      
     google(){
         console.log("i am in google ");
+        var provider = new firebase.auth.GoogleAuthProvider();
+        var promise = firebase.auth().signInWithPopup(provider);
+
+        promise
+          .then(result => {
+              var user = result.user;
+              console.log("result object is :",result);
+              console.log("user object is :",user);
+              firebase.database().ref('users/'+user.uid).set({
+                  email : user.email,
+                  name : user.displayName
+              });
+              this.setState({
+                err : user.displayName+" , Logged in Successfully using Google",
+                loggedin : true
+            })
+          })
+          .catch(e=>{
+              var err = e.message;
+              var code = e.code;
+              console.log("Error is:"+err+". Error code is :"+code);
+              this.setState({
+                  err : err,
+                  loggedin : false
+              })
+          })
     }
 
     constructor(props){
